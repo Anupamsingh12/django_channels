@@ -1,7 +1,7 @@
 import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
-
+from .models import Message
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
@@ -32,8 +32,9 @@ class ChatConsumer(WebsocketConsumer):
             self.room_group_name,
             {
                 'type': 'chat_message',
-                'message': message
-            }
+                'message': message,
+                'user':  str(self.scope['user'])
+                                  }
         )
 
     # Receive message from room group
@@ -44,3 +45,7 @@ class ChatConsumer(WebsocketConsumer):
         self.send(text_data=json.dumps({
             'message': message
         }))
+       # Message.objects.create(content=message, auther=self.scope['user'])
+    
+    
+        
